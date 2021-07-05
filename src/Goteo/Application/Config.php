@@ -130,7 +130,8 @@ class Config {
 			}
 
             \Goteo\Application\View::setTheme('responsive');
-			// die(\Goteo\Application\View::render('errors/config', ['msg' => $e->getMessage(), 'info' => $info, 'file' => $config_file, 'code' => 500], false));
+            // we die here and show a formatted error, most likely reason is a database misconfiguration
+			die(\Goteo\Application\View::render('errors/config', ['msg' => $e->getMessage(), 'info' => $info, 'file' => $config_file, 'code' => 500], false));
 			return;
 		}
 	}
@@ -218,6 +219,7 @@ class Config {
 		\Goteo\Controller\AdminController::addSubController('Goteo\Controller\Admin\CommunicationAdminController');
 		\Goteo\Controller\AdminController::addSubController('Goteo\Controller\Admin\FilterAdminController');
 		\Goteo\Controller\AdminController::addSubController('Goteo\Controller\Admin\WorkshopAdminController');
+		\Goteo\Controller\AdminController::addSubController('Goteo\Controller\Admin\FaqAdminController');
 		
         // TODO: to be replace by the new AdminController
         // \Goteo\Controller\AdminController::addSubController('Goteo\Controller\Admin\UsersSubController');
