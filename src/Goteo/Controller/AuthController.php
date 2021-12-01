@@ -35,15 +35,16 @@ class AuthController extends Controller {
         View::setTheme('responsive');
     }
 
-    public function redirectLoginAction(Request $request) {
+    public function redirectLoginAction(Request $request): RedirectResponse
+    {
         return $this->redirect('/login?'.$request->getQueryString());
     }
 
     /**
      * Checks if the user is logged or needs to redirect to SSL
      */
-    protected static function checkSession(Request $request) {
-
+    protected static function checkSession(Request $request)
+    {
         // Already logged? let's get out of here
         if (Session::isLogged()) {
             return App::dispatch(AppEvents::ALREADY_LOGGED, new FilterAuthEvent(Session::getUser()))->getUserRedirect($request);
@@ -77,7 +78,7 @@ class AuthController extends Controller {
                     if($request->request->has('rememberme')) {
                         $event->setProvider('rememberme');
                     }
-                    //Everything ok, redirecting
+
                     return App::dispatch(AppEvents::LOGIN_SUCCEEDED, $event)->getUserRedirect($request);
                 }
             }
@@ -191,7 +192,7 @@ class AuthController extends Controller {
         return $this->viewResponse('auth/signup', $result);
     }
 
-    public function passwordRecoveryAction($token = '', Request $request) {
+    public function passwordRecoveryAction(Request $request, $token = '') {
         // If the token is ok, login and redirect change password view
 
         if ($token) {
@@ -213,21 +214,21 @@ class AuthController extends Controller {
             }
         }
 
-        if($request->isXmlHttpRequest()) {
-            //Default error
+        if ($request->isXmlHttpRequest()) {
             $vars = ['error' => Text::get('recover-request-fail')];
 
             if ($request->isMethod('post')) {
                 $email = $request->request->get('email');
-                $return= $request->request->get('return');
+                $return = $request->request->get('return');
+                $user = User::recover($email);
 
-                if ($email && ($u = User::recover($email))) {
-                    $errors=array();
+                if ($email && $user != null) {
+                    $errors = array();
                     // Obtenemos la plantilla para asunto y contenido
-                    if( Mail::createFromTemplate($u->email, $u->name, Template::RETRIEVE_PASSWORD, [
-                            '%USERNAME%'   => $u->name,
-                            '%USERID%'     => $u->id,
-                            '%RECOVERURL%' => Config::get('url.main') . '/password-recovery/' . \mybase64_encode($u->getToken()) . '?return=' . $return
+                    if( Mail::createFromTemplate($user->email, $user->name, Template::RETRIEVE_PASSWORD, [
+                            '%USERNAME%'   => $user->name,
+                            '%USERID%'     => $user->id,
+                            '%RECOVERURL%' => Config::get('url.main') . '/password-recovery/' . \mybase64_encode($user->getToken()) . '?return=' . $return
                         ])
                         ->send($errors)) {
                             return $this->viewResponse(
@@ -325,11 +326,8 @@ class AuthController extends Controller {
         return $this->viewResponse('auth/login', ['return' => $request->query->get('return')]);
     }
 
-    /**
-     * Registro de usuario desde oauth
-     */
-    public function oauthSignupAction(Request $request) {
-
+    public function oauthSignupAction(Request $request)
+    {
         $userid = $request->request->get('userid');
         $email = $request->request->get('email');
         $provider_email = $request->request->get('provider_email');
