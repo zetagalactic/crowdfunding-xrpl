@@ -12,16 +12,17 @@ namespace Goteo\Controller;
 
 use Goteo\Core\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 
 class OAuthController extends Controller {
 
-    public function accessTokenAction(Request $request)
+    public function accessTokenAction(Request $request): Response
     {
         return $this->viewResponse('about/sample');
     }
 
-    public function authorizationAction(Request $request)
+    public function authorizationAction(Request $request): Response
     {
         return $this->viewResponse('about/sample');
     }
