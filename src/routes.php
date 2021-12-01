@@ -267,4 +267,8 @@ $routes->add('map-zoom-latlng', new Route(
     )
 ));
 
+$oauthRoutes = include __DIR__ . '/Routes/oauth_routes.php';
+$oauthRoutes->addPrefix('/oauth');
+$routes->addCollection($oauthRoutes);
+
 return $routes;
