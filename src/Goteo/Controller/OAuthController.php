@@ -17,12 +17,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class OAuthController extends Controller {
 
-    public function accessTokenAction(Request $request): Response
+    public function tokenAction(Request $request): Response
     {
         return $this->viewResponse('about/sample');
     }
 
-    public function authorizationAction(Request $request): Response
+    public function authorizeAction(Request $request): Response
     {
         return $this->viewResponse('about/sample');
     }

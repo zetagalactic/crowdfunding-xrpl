@@ -69,10 +69,9 @@ class AboutController extends Controller {
 
             $posts = Model\Info::getAll(true, Config::get('node'));
 
-            return new Response(View::render('about/info', array(
+            return new Response(View::render('about/info', [
                 'posts' => $posts
-            )
-         ));
+            ]));
         }
 
         // resto de casos
