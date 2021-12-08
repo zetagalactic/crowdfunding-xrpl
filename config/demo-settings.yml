@@ -60,7 +60,7 @@ mail:
     contact:      info@example.com     # consulting head
     manager:      manager@example.com  # accounts manager
     fail:         dev@example.com      # dev head
-    log:          sitelog@example.com  # Loggin mail
+    log:          sitelog@example.com  # Logging mail
 
     # Default users where to send project notifications by default
     # Only used if no consultants are assigned
@@ -73,7 +73,7 @@ geolocation:
                      # Ge one here: https://developers.google.com/maps/documentation/javascript/get-api-key
 
 # Social Login Services
-# Fill an uncomment the needed one's
+# Fill and uncomment the needed one's
 oauth:
     # Credentials app Facebook
     facebook:

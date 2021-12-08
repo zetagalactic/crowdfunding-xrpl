@@ -13,15 +13,12 @@ Resources/templates/legacy/view/header/highlights.html.php:                    R
 Resources/templates/legacy/view/header/banner.html.php:                        Resources/templates/default/partials/header/banner.php
 Resources/templates/legacy/view/header/share.html.php:                         Resources/templates/default/partials/header/share.php
 
-
 Resources/templates/legacy/view/footer.html.php:                               Resources/templates/default/partials/footer.php
 
 Resources/templates/legacy/view/pagination.html.php:                           Resources/templates/default/partials/pagination.php
 
 Resources/templates/legacy/view/error/default.html.php:                        Resources/templates/default/errors/default.php
 Resources/templates/legacy/view/error/404.html.php:                            Resources/templates/default/errors/not_found.php
-
-
 
 # Controller: Index
 Resources/templates/legacy/view/index.html.php:                                Resources/templates/default/home/index.php
@@ -44,7 +41,6 @@ Resources/templates/legacy/view/discover/patron.html.php:                      R
 Resources/templates/legacy/view/project/widget/project.html.php:               Resources/templates/default/project/widget/project.php
 Resources/templates/legacy/view/project/view.html.php:   			           Resources/templates/default/project/index.php
 
-
 # Controller: Glossary
 Resources/templates/legacy/view/glossary/index.html.php:   	                   Resources/templates/default/glossary/index.php
 
@@ -53,8 +49,3 @@ Resources/templates/legacy/view/about/contact.html.php:   	   	               Re
 Resources/templates/legacy/view/about/howto.html.php:   	   	               Resources/templates/default/about/howto.php
 Resources/templates/legacy/view/about/info.html.php:   	   	                   Resources/templates/default/about/info.php
 Resources/templates/legacy/view/about/sample.html.php:   	   	               Resources/templates/default/about/sample.php
-
-
-
-
-

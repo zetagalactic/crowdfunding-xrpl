@@ -60,7 +60,7 @@ mail:
     contact:      info@localhost     # consulting head
     manager:      manager@localhost  # accounts manager
     fail:         dev@localhost      # dev head
-    log:          sitelog@localhost  # Loggin mail
+    log:          sitelog@localhost  # Logging mail
 
 # This will be used for geolocating users, projects, and mail tracking
 geolocation:
@@ -68,7 +68,7 @@ geolocation:
                      # Ge one here: https://developers.google.com/maps/documentation/javascript/get-api-key
 
 # Social Login Services
-# Fill an uncomment the needed one's
+# Fill and uncomment the needed one's
 oauth:
     # Credentials app Facebook
     facebook:

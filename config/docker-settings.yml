@@ -84,7 +84,7 @@ mail:
     contact:      info@goteo.test     # consulting head
     manager:      manager@goteo.test  # accounts manager
     fail:         dev@goteo.test      # dev head
-    log:          sitelog@goteo.test  # Loggin mail
+    log:          sitelog@goteo.test  # Logging mail
 
     transport:
         from:          noreply@goteo.test
@@ -107,7 +107,7 @@ geolocation:
                      # Ge one here: https://developers.google.com/maps/documentation/javascript/get-api-key
 
 # Social Login Services
-# Fill an uncomment the needed one's
+# Fill and uncomment the needed one's
 oauth:
     # Credentials app Facebook
     facebook:
@@ -146,5 +146,5 @@ map:
 
 # Optional Chatbot from https://github.com/GoteoFoundation/chatbot
 chatbot:
-    url: 
-    id: 
+    url:
+    id:

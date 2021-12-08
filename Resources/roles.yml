@@ -10,7 +10,7 @@ user: # This user is assigned automatically to all users regardless the user_rol
         - create-project # create own projects, this permission is implicit
         - edit-project   # edit own projects, this permission is implicit
         - remove-project # remove own project, this permission is implicit
-    level: 0 # Order of the role, roles with supperior level can do some actions over this
+    level: 0 # Order of the role, roles with superior level can do some actions over this
 
 vip:
     extends: user # inherits permissions from role "user"
@@ -42,7 +42,7 @@ caller:
 matcher:
     extends: user
     perms:
-        - create-matcher # create own matcher, if meet the requeriment
+        - create-matcher # create own matcher, if meet the requirement
         - edit-matcher  # edit own matcher
         - remove-matcher # remove own matcher
 
@@ -91,7 +91,7 @@ consultant:
         - edit-calls # Edit calls assigned as a consultant
         - remove-calls # Remove calls assigned as a consultant
         - impersonate-owners # Impersonate projects owners assigned as a consultant
-        - assign-checker # Assignate any other user for review projects
+        - assign-checker # Assign any other user for review projects
         - admin-module-users # Can access to module UserAdminController
         - admin-module-blog # create/edit/delete non-project posts
         - admin-module-stories # create/edit/delete non-project posts
@@ -119,7 +119,7 @@ admin:
         - create-matcher # Create a matcher for a user
         - edit-any-matcher # View any editing matcher
         - remove-any-matcher # Remove any matcher
-        - admin-module-channels # Can access to channels admin modules
+        - admin-module-channels # Can access to channel admin modules
     level: 70
 
 superadmin:
