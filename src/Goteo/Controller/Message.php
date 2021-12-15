@@ -21,6 +21,7 @@ use Goteo\Library\Text;
 use Goteo\Model;
 use Goteo\Model\Template;
 use function str_replace;
+use function vsprintf;
 
 class Message extends Controller {
 
@@ -53,7 +54,7 @@ class Message extends Controller {
                 $log->setTarget($projectData->id);
                 if (empty($_POST['thread'])) {
                     // nuevo hilo
-                    $log_html = \vsprintf('%s ha creado un tema en %s del proyecto %s', array(
+                    $log_html = vsprintf('%s ha creado un tema en %s del proyecto %s', array(
                         Feed::item('user', Session::getUser()->name, Session::getUserId()),
                         Feed::item('message', Text::get('project-menu-messages'), $projectData->id.'/messages#message'.$message->id),
                         Feed::item('project', $projectData->name, $projectData->id)
@@ -62,13 +63,13 @@ class Message extends Controller {
                     // respuesta
                     // si una respuesta a un mensaje de colaboraicón
                     if (!empty($support)) {
-                        $log_html = \vsprintf('Nueva colaboración de %s con %s en el proyecto %s', array(
+                        $log_html = vsprintf('Nueva colaboración de %s con %s en el proyecto %s', array(
                             Feed::item('user', Session::getUser()->name, Session::getUserId()),
                             Feed::item('message', $support, $projectData->id.'/messages#message'.$_POST['thread']),
                             Feed::item('project', $projectData->name, $projectData->id)
                         ));
                     } else { // es una respuesta a un hilo normal
-                        $log_html = \vsprintf('%s ha respondido en %s del proyecto %s', array(
+                        $log_html = vsprintf('%s ha respondido en %s del proyecto %s', array(
                             Feed::item('user', Session::getUser()->name, Session::getUserId()),
                             Feed::item('message', Text::get('project-menu-messages'), $projectData->id.'/messages#message'.$message->id),
                             Feed::item('project', $projectData->name, $projectData->id)
@@ -178,7 +179,9 @@ class Message extends Controller {
         throw new Redirection("/project/{$project}/participate#child-msg-".$message->id, Redirection::TEMPORARY);
     }
 
-    // DEPRECATED
+    /**
+     * @deprecated
+     */
     public function edit ($id, $project) {
 
         if (isset($_POST['message'])) {
@@ -366,7 +369,7 @@ class Message extends Controller {
                     $projectData = Model\Project::getMini($project);
                     $log = new Feed();
                     $log->setTarget($projectData->id);
-                    $log_html = \vsprintf('%s ha escrito un %s en la entrada "%s" en las %s del proyecto %s', array(
+                    $log_html = vsprintf('%s ha escrito un %s en la entrada "%s" en las %s del proyecto %s', array(
                         Feed::item('user', Session::getUser()->name, Session::getUserId()),
                         Feed::item('message', 'Comentario'),
                         Feed::item('update-comment', $postData->title, $projectData->id.'/updates/'.$postData->id.'#comment'.$comment->id),
@@ -419,7 +422,7 @@ class Message extends Controller {
                 } else {
                     $log = new Feed();
                     $log->setTarget('goteo', 'blog');
-                    $log_html = \vsprintf('%s ha escrito un %s en la entrada "%s" del blog de %s', array(
+                    $log_html = vsprintf('%s ha escrito un %s en la entrada "%s" del blog de %s', array(
                         Feed::item('user', Session::getUser()->name, Session::getUserId()),
                         Feed::item('message', 'Comentario'),
                         Feed::item('blog', $postData->title, $postData->id.'#comment'.$comment->id),

@@ -19,7 +19,8 @@ use Goteo\Library\Text;
 use GoteoBot\Model\Bot\TelegramBot;
 
 class BotProjectDashboardController extends \Goteo\Controller\Dashboard\ProjectDashboardController {
-    protected $user, $admin = false;
+    protected $user;
+    protected bool $admin = false;
 
     static function createBotSidebar(Project $project) {
 
@@ -35,11 +36,11 @@ class BotProjectDashboardController extends \Goteo\Controller\Dashboard\ProjectD
 
         $project = $this->validateProject($pid);
         if($project instanceOf Response) return $project;
-        
+
         $token = \mybase64_encode($project->id);
 
         $url = TelegramBot::URL . "/" . TelegramBot::getName() . "?start=" . $token;
-        
+
         return $this->viewResponse('dashboard/project/integration',[
             'project' => $project,
             'token' => $token,

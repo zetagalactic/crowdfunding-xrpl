@@ -31,11 +31,11 @@ class MessageListener extends AbstractListener {
         $project = $message->getProject();
         $owner = $project->getOwner();
 
-        $response_url = SITE_URL . '/dashboard/messages#comments-' . ($message->thread ? $message->thread : $message->id);
+        $response_url = SITE_URL . '/dashboard/messages#comments-' . ($message->thread ?: $message->id);
         if($template === Template::SUPPORT_THREAD_RESPONSE)
             $response_url = SITE_URL . '/project/' . $project->id .'/participate#comments-list-' . ($message->thread ? $message->thread : $message->id);
 
-        if($delayed) {
+        if ($delayed) {
             // Send as a newsletter
             $mail = Mail::createFromTemplate('any', '', $template, [
                 '%MESSAGE%' => $message->message,
@@ -116,7 +116,7 @@ class MessageListener extends AbstractListener {
 
         $title = $message->getSubject();
         // Message created from support type
-        if($type === 'project-support') {
+        if ($type === 'project-support') {
             // Feed event
             $log = new Feed();
             $log->setTarget($project->id)
@@ -145,7 +145,7 @@ class MessageListener extends AbstractListener {
 
             // No mails sent
         }
-        elseif($type === 'project-support-response') {
+        elseif ($type === 'project-support-response') {
             $log = new Feed();
             $log->setTarget($project->id)
                 ->populate('feed-message-new-project-response',
@@ -170,7 +170,7 @@ class MessageListener extends AbstractListener {
 
             $this->sendMail($message, Template::SUPPORT_THREAD_RESPONSE, $message->getRecipients());
         }
-        elseif($type === 'project-comment') {
+        elseif ($type === 'project-comment') {
             $log = new Feed();
             $log->setTarget($project->id)
                 ->populate('feed-message-new-project-response',
@@ -186,7 +186,7 @@ class MessageListener extends AbstractListener {
             // sent mail to project owner
             $this->sendMail($message, Template::OWNER_NEW_THREAD, [$project->getOwner()]);
         }
-        elseif($type === 'project-comment-response') {
+        elseif ($type === 'project-comment-response') {
             $log = new Feed();
             $log->setTarget($project->id)
                 ->populate('feed-message-new-project-response',
@@ -214,7 +214,7 @@ class MessageListener extends AbstractListener {
             $this->sendMail($message, Template::SUPPORT_THREAD_RESPONSE, $message->getRecipients());
 
         }
-        elseif($type === 'project-private') {
+        elseif ($type === 'project-private') {
             $log = new Feed();
             $log->setTarget($project->id)
                 ->populate('feed-message-new-project-response',
@@ -230,7 +230,7 @@ class MessageListener extends AbstractListener {
             // sent mail to recipients
             $this->sendMail($message, Template::MESSAGE_PROJECT_THREAD, $message->getRecipients(), $event->getDelayed());
         }
-        elseif($type === 'project-private-response') {
+        elseif ($type === 'project-private-response') {
             $log = new Feed();
             $log->setTarget($project->id)
                 ->populate('feed-message-new-project-response',
@@ -258,13 +258,13 @@ class MessageListener extends AbstractListener {
             // Update num. messengers
             $message::numMessengers($project);
         }
-
     }
 
-	public static function getSubscribedEvents() {
-		return array(
+	public static function getSubscribedEvents(): array
+    {
+		return [
             AppEvents::MESSAGE_CREATED => 'onMessageCreated',
 			AppEvents::MESSAGE_DELETED => 'onMessageDeleted',
-		);
+        ];
 	}
 }
