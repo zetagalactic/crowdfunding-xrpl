@@ -298,7 +298,7 @@ class MessagesApiController extends AbstractApiController {
         }
         if ($users) {
             $message->setRecipients($users);
-            if (is_array($users) && count($users) > 1) $event->setDelayed(true); // Send in background as a newsletter
+            if (is_array($users) && count($users) > 1) $event->setDelayed(true);
         }
 
         if ($recipients = $message->getRecipients()) {

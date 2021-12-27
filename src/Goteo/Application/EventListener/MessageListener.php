@@ -14,6 +14,7 @@ use Goteo\Application\Event\FilterMessageEvent;
 use Goteo\Application\Exception\MailException;
 use Goteo\Application\AppEvents;
 use Goteo\Application\Config;
+use Goteo\Model\Project;
 use Goteo\Model\Template;
 use Goteo\Model\Message;
 use Goteo\Model\Mail;
@@ -26,14 +27,11 @@ use Goteo\Library\FeedBody;
 
 class MessageListener extends AbstractListener {
 
-    private function sendMail(Message $message, $template, array $recipients = [], $delayed = false) {
-        // send mail to owner
+    private function sendMailToRecipients(Message $message, $template, array $recipients = [], $delayed = false)
+    {
         $project = $message->getProject();
         $owner = $project->getOwner();
-
-        $response_url = SITE_URL . '/dashboard/messages#comments-' . ($message->thread ?: $message->id);
-        if($template === Template::SUPPORT_THREAD_RESPONSE)
-            $response_url = SITE_URL . '/project/' . $project->id .'/participate#comments-list-' . ($message->thread ? $message->thread : $message->id);
+        $response_url = $this->getResponseUrl($message, $template, $project);
 
         if ($delayed) {
             // Send as a newsletter
@@ -74,14 +72,14 @@ class MessageListener extends AbstractListener {
             throw new MailException(Text::get('dashboard-message-donors-error'));
         }
         $errors = [];
-        foreach($recipients as $user) {
+        foreach ($recipients as $user) {
             $lang = User::getPreferences($user)->comlang;
             $r_url = $response_url;
-            if($project->userIsOwner($user)) {
-                if($template === Template::MESSAGE_THREAD_RESPONSE)
+            if ($project->userIsOwner($user)) {
+                if ($template === Template::MESSAGE_THREAD_RESPONSE)
                     $r_url = SITE_URL . '/dashboard/project/' . $project->id . '/invests?filter%5Bquery%5D=' . urlencode($message->getUser()->email) . '#msg-' . $message->getUser()->id;
-                if($template === Template::SUPPORT_THREAD_RESPONSE)
-                    $r_url = SITE_URL . '/dashboard/project/' . $project->id . '/supports#comments-' . ($message->thread ? $message->thread : $message->id);
+                if ($template === Template::SUPPORT_THREAD_RESPONSE)
+                    $r_url = SITE_URL . '/dashboard/project/' . $project->id . '/supports#comments-' . ($message->thread ?: $message->id);
             }
 
             $mail = Mail::createFromTemplate($user->email, $user->name, $template, [
@@ -99,7 +97,7 @@ class MessageListener extends AbstractListener {
             ->setReply($message->getUser())
             ->send($errors);
 
-            if($errors) {
+            if ($errors) {
                 throw new MailException(implode("\n", $errors));
             }
         }
@@ -107,28 +105,46 @@ class MessageListener extends AbstractListener {
         $this->notice('Message sent', [$message, 'recipients' => $recipients, 'errors' => $errors]);
     }
 
-	public function onMessageCreated(FilterMessageEvent $event) {
+    private function getResponseUrl(Message $message, string $template, Project $project): string
+    {
+        $responseUrl = SITE_URL . '/dashboard/messages#comments-' . ($message->thread ?: $message->id);
+        if ($template === Template::SUPPORT_THREAD_RESPONSE) {
+            $responseUrl = SITE_URL . '/project/' . $project->id .'/participate#comments-list-' . ($message->thread ?: $message->id);
+        }
+
+        return $responseUrl;
+    }
+
+	public function onMessageCreated(FilterMessageEvent $event)
+    {
         $message = $event->getMessage();
         $project = $message->getProject();
         $user = $message->getUser();
         $type = $message->getType();
-        $this->notice("Message created", ['project' => $message->project, 'message_id' => $message->id, 'type' => $type, 'delayed' => $event->getDelayed(), 'message' => $message->message]);
+        $this->notice("Message created", [
+            'project' => $message->project,
+            'message_id' => $message->id,
+            'type' => $type,
+            'delayed' => $event->getDelayed(),
+            'message' => $message->message
+        ]);
 
         $title = $message->getSubject();
         // Message created from support type
-        if ($type === 'project-support') {
+        if ($type === Message::TYPE_PROJECT_SUPPORT) {
             // Feed event
             $log = new Feed();
             $log->setTarget($project->id)
-                ->populate('feed-message-new-support',
-                '/admin/projects',
-
-               new FeedBody(null, null, 'feed-message-message-published', [
-                    '%USER%'    => Feed::item('user', $user->name, $user->id),
-                    '%TYPE%'    => new FeedBody('message', null, 'message-project-support'),
-                    '%PROJECT%' => Feed::item('project', $project->name, $project->id),
-                    '%TITLE%'    => Feed::item('update', $title, $project->id . '/participate#message' . $message->id)
-                ]))
+                ->populate(
+                    'feed-message-new-support',
+                    '/admin/projects',
+                    new FeedBody(null, null, 'feed-message-message-published', [
+                        '%USER%'    => Feed::item('user', $user->name, $user->id),
+                        '%TYPE%'    => new FeedBody('message', null, 'message-project-support'),
+                        '%PROJECT%' => Feed::item('project', $project->name, $project->id),
+                        '%TITLE%'    => Feed::item('update', $title, $project->id . '/participate#message' . $message->id)
+                    ])
+                )
                 ->doAdmin('user');
 
             // evento público, si el proyecto es público
@@ -144,18 +160,18 @@ class MessageListener extends AbstractListener {
             }
 
             // No mails sent
-        }
-        elseif ($type === 'project-support-response') {
+        } elseif ($type === Message::TYPE_PROJECT_SUPPORT_RESPONSE) {
             $log = new Feed();
             $log->setTarget($project->id)
-                ->populate('feed-message-new-project-response',
-                '/admin/projects',
-
-               new FeedBody(null, null, 'feed-message-support-response-published', [
-                    '%USER%'    => Feed::item('user', $user->name, $user->id),
-                    '%PROJECT%' => Feed::item('project', $project->name, $project->id),
-                    '%TITLE%'    => Feed::item('update', $title, $project->id . '/participate#message' . $message->id)
-                ]))
+                ->populate(
+                    'feed-message-new-project-response',
+                    '/admin/projects',
+                    new FeedBody(null, null, 'feed-message-support-response-published', [
+                        '%USER%'    => Feed::item('user', $user->name, $user->id),
+                        '%PROJECT%' => Feed::item('project', $project->name, $project->id),
+                        '%TITLE%'    => Feed::item('update', $title, $project->id . '/participate#message' . $message->id)
+                    ])
+                )
                 ->doAdmin('user');
 
             // evento público, si el proyecto es público
@@ -168,86 +184,86 @@ class MessageListener extends AbstractListener {
                 $user->avatar->id)
                 ->doPublic('community');
 
-            $this->sendMail($message, Template::SUPPORT_THREAD_RESPONSE, $message->getRecipients());
-        }
-        elseif ($type === 'project-comment') {
+            $this->sendMailToRecipients($message, Template::SUPPORT_THREAD_RESPONSE, $message->getRecipients());
+        } elseif ($type === Message::TYPE_PROJECT_COMMENT) {
             $log = new Feed();
             $log->setTarget($project->id)
-                ->populate('feed-message-new-project-response',
-                '/admin/projects',
-
-               new FeedBody(null, null, 'feed-message-thread-published', [
-                    '%USER%'    => Feed::item('user', $user->name, $user->id),
-                    '%PROJECT%' => Feed::item('project', $project->name, $project->id),
-                    '%TYPE%'    => new FeedBody('message', $project->id . '/participate#message' . $message->id, 'project-menu-messages')
-                ]))
+                ->populate(
+                    'feed-message-new-project-response',
+                    '/admin/projects',
+                    new FeedBody(null, null, 'feed-message-thread-published', [
+                        '%USER%'    => Feed::item('user', $user->name, $user->id),
+                        '%PROJECT%' => Feed::item('project', $project->name, $project->id),
+                        '%TYPE%'    => new FeedBody('message', $project->id . '/participate#message' . $message->id, 'project-menu-messages')
+                    ])
+                )
                 ->doAdmin('user');
 
             // sent mail to project owner
-            $this->sendMail($message, Template::OWNER_NEW_THREAD, [$project->getOwner()]);
-        }
-        elseif ($type === 'project-comment-response') {
+            $this->sendMailToRecipients($message, Template::OWNER_NEW_THREAD, [$project->getOwner()]);
+        } elseif ($type === Message::TYPE_PROJECT_COMMENT_RESPONSE) {
             $log = new Feed();
             $log->setTarget($project->id)
-                ->populate('feed-message-new-project-response',
-                '/admin/projects',
-
-               new FeedBody(null, null, 'feed-message-response-published', [
-                    '%USER%'    => Feed::item('user', $user->name, $user->id),
-                    '%PROJECT%' => Feed::item('project', $project->name, $project->id),
-                    '%TITLE%'    => Feed::item('update', $title, $project->id . '/participate#message' . $message->id)
-                ]))
+                ->populate(
+                    'feed-message-new-project-response',
+                    '/admin/projects',
+                    new FeedBody(null, null, 'feed-message-response-published', [
+                        '%USER%'    => Feed::item('user', $user->name, $user->id),
+                        '%PROJECT%' => Feed::item('project', $project->name, $project->id),
+                        '%TITLE%'    => Feed::item('update', $title, $project->id . '/participate#message' . $message->id)
+                    ])
+                )
                 ->doAdmin('user');
 
             // evento público, si el proyecto es público
-            $log->populate($user->name,
+            $log->populate(
+                $user->name,
                 '/user/profile/' . $user->id,
                 new FeedBody(null, null, 'feed-message-response', [
                     '%PROJECT%' => Feed::item('project', $project->name, $project->id),
                     '%TYPE%'    => new FeedBody('message', $project->id . '/participate#message' . $message->id, 'project-menu-messages'),
-
                 ]),
-                $user->avatar->id)
+                $user->avatar->id
+            )
                 ->doPublic('community');
 
             // sent mail to project owner and recipients
-            $this->sendMail($message, Template::SUPPORT_THREAD_RESPONSE, $message->getRecipients());
-
-        }
-        elseif ($type === 'project-private') {
+            $this->sendMailToRecipients($message, Template::SUPPORT_THREAD_RESPONSE, $message->getRecipients());
+        } elseif ($type === Message::TYPE_PROJECT_PRIVATE_COMMUNICATION) {
             $log = new Feed();
             $log->setTarget($project->id)
-                ->populate('feed-message-new-project-response',
-                '/admin/projects',
-
-               new FeedBody(null, null, 'feed-message-thread-published', [
-                    '%USER%'    => Feed::item('user', $user->name, $user->id),
-                    '%PROJECT%' => Feed::item('project', $project->name, $project->id),
-                    '%TYPE%'    => new FeedBody('message', '/dashboard/' . $project->id . '/invests#message' . $message->id, 'project-menu-messages')
-                ]))
+                ->populate(
+                    'feed-message-new-project-response',
+                    '/admin/projects',
+                    new FeedBody(null, null, 'feed-message-thread-published', [
+                        '%USER%'    => Feed::item('user', $user->name, $user->id),
+                        '%PROJECT%' => Feed::item('project', $project->name, $project->id),
+                        '%TYPE%'    => new FeedBody('message', '/dashboard/' . $project->id . '/invests#message' . $message->id, 'project-menu-messages')
+                    ])
+                )
                 ->doAdmin('user');
 
             // sent mail to recipients
-            $this->sendMail($message, Template::MESSAGE_PROJECT_THREAD, $message->getRecipients(), $event->getDelayed());
-        }
-        elseif ($type === 'project-private-response') {
+            $this->sendMailToRecipients($message, Template::MESSAGE_PROJECT_THREAD, $message->getRecipients(), $event->getDelayed());
+        } elseif ($type === Message::TYPE_PROJECT_PRIVATE_COMMUNICATION_RESPONSE) {
             $log = new Feed();
             $log->setTarget($project->id)
-                ->populate('feed-message-new-project-response',
-                '/admin/projects',
-
-               new FeedBody(null, null, 'feed-message-response-published', [
-                    '%USER%'    => Feed::item('user', $user->name, $user->id),
-                    '%PROJECT%' => Feed::item('project', $project->name, $project->id),
-                    '%TYPE%'    => new FeedBody('message', '/dashboard/' . $project->id . '/invests#message' . $message->id, 'project-menu-messages')
-                ]))
+                ->populate(
+                    'feed-message-new-project-response',
+                    '/admin/projects',
+                    new FeedBody(null, null, 'feed-message-response-published', [
+                        '%USER%'    => Feed::item('user', $user->name, $user->id),
+                        '%PROJECT%' => Feed::item('project', $project->name, $project->id),
+                        '%TYPE%'    => new FeedBody('message', '/dashboard/' . $project->id . '/invests#message' . $message->id, 'project-menu-messages')
+                    ])
+                )
                 ->doAdmin('user');
 
             // sent mail to recipients
             $recipients = $message->getRecipients();
             // To everyone on the same thread if shared
             if($message->shared) $recipients = $message->getParticipants();
-            $this->sendMail($message, Template::MESSAGE_THREAD_RESPONSE, $recipients, $event->getDelayed());
+            $this->sendMailToRecipients($message, Template::MESSAGE_THREAD_RESPONSE, $recipients, $event->getDelayed());
         }
     }
 

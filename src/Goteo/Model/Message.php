@@ -24,6 +24,13 @@ use Goteo\Application\Exception\ModelNotFoundException;
 
 class Message extends \Goteo\Core\Model {
 
+    public const TYPE_PROJECT_PRIVATE_COMMUNICATION = 'project-private';
+    public const TYPE_PROJECT_COMMENT = 'project-comment';
+    public const TYPE_PROJECT_SUPPORT = 'project-support';
+    public const TYPE_PROJECT_PRIVATE_COMMUNICATION_RESPONSE = 'project-private-response';
+    public const TYPE_PROJECT_COMMENT_RESPONSE = 'project-comment-response';
+    public const TYPE_PROJECT_SUPPORT_RESPONSE = 'project-support-response';
+
     public
         $id,
         $user,
@@ -419,9 +426,9 @@ class Message extends \Goteo\Core\Model {
         $type = '';
         if($this->project) {
             if($this->private) {
-                $type = 'project-private';
+                $type = self::TYPE_PROJECT_PRIVATE_COMMUNICATION;
             } else {
-                $type = 'project-comment';
+                $type = self::TYPE_PROJECT_COMMENT;
             }
             $sql = "SELECT id FROM support WHERE thread = :id";
             $values = [':id' => $this->id];
@@ -430,7 +437,7 @@ class Message extends \Goteo\Core\Model {
             }
             $query = self::query($sql, $values);
             if($query->fetchColumn()) {
-                $type = 'project-support';
+                $type = self::TYPE_PROJECT_SUPPORT;
             }
             if($this->thread) {
                 $type .= '-response';
@@ -653,8 +660,6 @@ class Message extends \Goteo\Core\Model {
                   ) AS real_num
                 FROM project p
                 WHERE p.id = :project";
-
-        // die(\sqldbg($sql, $values));
 
         $query = static::query($sql, $values);
         if($got = $query->fetchObject()) {
