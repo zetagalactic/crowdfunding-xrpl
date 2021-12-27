@@ -21,6 +21,7 @@ use Goteo\Application\Lang;
 use Goteo\Application\Config;
 use Goteo\Application\Exception\ModelException;
 use Goteo\Application\Exception\ModelNotFoundException;
+use PDO;
 
 class Message extends \Goteo\Core\Model {
 
@@ -39,7 +40,7 @@ class Message extends \Goteo\Core\Model {
         $date, // timestamp del momento en que se creó el mensaje
         $subject, // if set, used as subject instead of template default subject (if this message is sent by mail)
         $message, // el texto del mensaje en si
-        $responses = array(), // array de instancias mensaje que son respuesta a este
+        $responses = [], // array de instancias mensaje que son respuesta a este
         $all_responses = [], // cache array
         $blocked = 0, //no se puede editar ni borrar (es un mensaje thread de colaboracion)
         $closed = 0, // no se puede responder
@@ -63,9 +64,8 @@ class Message extends \Goteo\Core\Model {
     /*
      *  Devuelve datos de un mensaje
      */
-    public static function get ($id, $lang = null) {
-
-
+    public static function get ($id, $lang = null)
+    {
         list($fields, $joins) = self::getLangsSQLJoins($lang, Config::get('sql_lang'));
 
         $sql="
@@ -90,10 +90,7 @@ class Message extends \Goteo\Core\Model {
             ";
 
         $query = self::query($sql, array(':id' => $id));
-        if($message = $query->fetchObject(__CLASS__)) {
-
-            // datos del usuario. Eliminación de user::getMini
-
+        if ($message = $query->fetchObject(__CLASS__)) {
             $user = new User;
             $user->id = $message->user_id;
             $user->name = $message->user_name;
@@ -101,13 +98,6 @@ class Message extends \Goteo\Core\Model {
             $user->avatar = Image::get($message->user_avatar);
 
             $message->user = $user;
-
-
-            // reconocimiento de enlaces y saltos de linea
-            // $message->message = nl2br(Text::urlink($message->message));
-
-            // //hace tanto
-            // $message->timeago = Feed::time_ago($message->date);
 
             // Deprecated: to be removed
             if (empty($message->thread)) {
@@ -120,10 +110,9 @@ class Message extends \Goteo\Core\Model {
                         thread = ?
                     ", array($id));
 
-                foreach ($query->fetchAll(\PDO::FETCH_CLASS, __CLASS__) as $response) {
+                foreach ($query->fetchAll(PDO::FETCH_CLASS, __CLASS__) as $response) {
                     $message->responses[] = $response;
                 }
-
             }
         }
         return $message;
@@ -172,12 +161,8 @@ class Message extends \Goteo\Core\Model {
             " . ($sqlFilter ? ' AND ' .implode(' AND ', $sqlFilter) : '') . "
             ORDER BY $order
             ";
-        // die(\sqldbg($sql, $values));
         $query = static::query($sql, $values);
-        foreach ($query->fetchAll(\PDO::FETCH_CLASS, __CLASS__) as $message) {
-
-            // datos del usuario. Eliminación User::getMini
-
+        foreach ($query->fetchAll(PDO::FETCH_CLASS, __CLASS__) as $message) {
             $user = new User;
             $user->id = $message->user_id;
             $user->name = $message->user_name;
@@ -185,11 +170,7 @@ class Message extends \Goteo\Core\Model {
             $user->avatar = Image::get($message->user_avatar);
 
             $message->user = $user;
-
-            // reconocimiento de enlaces y saltos de linea
             $message->message = nl2br(Text::urlink($message->message));
-
-            //hace tanto
             $message->timeago = Feed::time_ago($message->date);
 
             $query = static::query("
@@ -199,7 +180,7 @@ class Message extends \Goteo\Core\Model {
                 ORDER BY date ASC, id ASC
                 ", array($message->id));
 
-            foreach ($query->fetchAll(\PDO::FETCH_CLASS) as $response) {
+            foreach ($query->fetchAll(PDO::FETCH_CLASS) as $response) {
                 $message->responses[$response->id] = self::get($response->id);
             }
 
@@ -212,8 +193,9 @@ class Message extends \Goteo\Core\Model {
     /**
      * Returns user messages
      */
-    public static function getUserThreads($user, $filters = [], $offset = 0, $limit = 10, $count = false, $order = 'date_max DESC, `date` DESC, id DESC') {
-
+    public static function getUserThreads(
+        $user, $filters = [], $offset = 0, $limit = 10, $count = false, $order = 'date_max DESC, `date` DESC, id DESC'
+    ) {
         $id = $user instanceOf User ? $user->id : $user;
         $values = [':user' => $id];
         $sqlFilter = [];
@@ -261,13 +243,12 @@ class Message extends \Goteo\Core\Model {
         $sql .=  $order ? " ORDER BY $order" : '';
         $sql .= " LIMIT $offset, $limit";
 
-        // print_r($sql);print_r($values);die(\sqldbg($sql, $values));
         $query = self::query($sql, $values);
-        if($resp = $query->fetchAll(\PDO::FETCH_CLASS, __CLASS__)) {
+        if($resp = $query->fetchAll(PDO::FETCH_CLASS, __CLASS__)) {
             return $resp;
         }
-        return [];
 
+        return [];
     }
 
     /**
@@ -303,20 +284,18 @@ class Message extends \Goteo\Core\Model {
         IF(ISNULL(u2.name), u1.name, u2.name)  AS recipient_name $sql ORDER BY date DESC, id DESC LIMIT $offset, $limit";
 
         $sql = "SELECT * FROM ($sql) rev ORDER BY date ASC, id ASC ";
-        // die(sqldbg($sql, $values));
         $query = self::query($sql, $values);
-        if($resp = $query->fetchAll(\PDO::FETCH_CLASS, __CLASS__)) {
+        if($resp = $query->fetchAll(PDO::FETCH_CLASS, __CLASS__)) {
             return $resp;
         }
-        return [];
 
+        return [];
     }
 
     /**
      * Assigns thread
      * In mode 'auto' search for the most recent parent thread with
-     * the same caracteristics: same user in the replies and same project
-     * @param [type] $thread [description]
+     * the same characteristics: same user in the replies and same project
      */
     public function setThread($thread) {
         if($thread === 'auto') {
@@ -386,7 +365,6 @@ class Message extends \Goteo\Core\Model {
         return null;
     }
 
-    // Description title from project
     public function getTitle() {
         if($this->project) return $this->getProject()->name;
     }
@@ -420,9 +398,9 @@ class Message extends \Goteo\Core\Model {
      * project-support-response (support message response)
      * project-private (for donors communication)
      * project-private-response (responses from donors communication)
-     * @return string
      */
-    public function getType() {
+    public function getType(): string
+    {
         $type = '';
         if($this->project) {
             if($this->private) {
@@ -473,11 +451,11 @@ class Message extends \Goteo\Core\Model {
         $limit = (int) $limit;
         $sql = "SELECT a.* FROM message a $sql ORDER BY date DESC, id DESC LIMIT $offset, $limit";
         $sql = "SELECT * FROM ($sql) rev ORDER BY date ASC, id ASC ";
-        // die(\sqldbg($sql, $values)." [$with_private]");
         $query = self::query($sql, $values);
-        if($resp = $query->fetchAll(\PDO::FETCH_CLASS, __CLASS__)) {
+        if($resp = $query->fetchAll(PDO::FETCH_CLASS, __CLASS__)) {
             return $resp;
         }
+
         return [];
     }
 
@@ -524,7 +502,7 @@ class Message extends \Goteo\Core\Model {
                 WHERE message_user.message_id = :id";
 
             $query = self::query($sql, [':id' => $this->id]);
-            if($resp = $query->fetchAll(\PDO::FETCH_CLASS, '\Goteo\Model\User')) {
+            if($resp = $query->fetchAll(PDO::FETCH_CLASS, '\Goteo\Model\User')) {
                 foreach($resp as $user) {
                     $this->recipients[$user->id] = $user;
                 }
@@ -543,7 +521,7 @@ class Message extends \Goteo\Core\Model {
 
             $query = self::query($sql, [':id' => $this->id]);
             $this->participants = $this->getRecipients();
-            if($resp = $query->fetchAll(\PDO::FETCH_CLASS, User::class)) {
+            if($resp = $query->fetchAll(PDO::FETCH_CLASS, User::class)) {
                 foreach($resp as $user) {
                     $this->participants[$user->id] = $user;
                 }
@@ -594,7 +572,7 @@ class Message extends \Goteo\Core\Model {
     /*
      * Para que el admin pueda borrar mensajes que no aporten nada
      */
-    public static function delete ($id, &$errors = array()) {
+    public static function delete($id, &$errors = []) {
 
         if(empty($id)) {
             // throw new Exception("Delete error: ID not defined!");
@@ -603,7 +581,6 @@ class Message extends \Goteo\Core\Model {
         $m = self::get($id);
 
         try {
-
             if ($m->blocked == 1) {
                 return false;
             }
@@ -624,7 +601,6 @@ class Message extends \Goteo\Core\Model {
             return false;
         }
         return true;
-
     }
 
 
@@ -634,7 +610,7 @@ class Message extends \Goteo\Core\Model {
      * @param numeric $id Id del mensaje (thread)
      * @return bool true/false
      */
-    public static function isSupport ($id) {
+    public static function isSupport($id) {
         $sql = "SELECT support FROM support WHERE thread = :id";
         $query = self::query($sql, array(':id'=>$id));
         $support = $query->fetchColumn();
@@ -673,7 +649,6 @@ class Message extends \Goteo\Core\Model {
         return (int) $got->real_num;
     }
 
-
     /*
      * Lista de usuarios mensajeros de un proyecto
      */
@@ -696,8 +671,7 @@ class Message extends \Goteo\Core\Model {
                     ON user.id=message.user
                 WHERE message.project = :id";
         $query = self::query($sql, array(':id'=>$id));
-        foreach ($query->fetchAll(\PDO::FETCH_OBJ) as $msg) {
-
+        foreach ($query->fetchAll(PDO::FETCH_OBJ) as $msg) {
             $msgData = (object) array(
                     'text' => $msg->text,
                     'thread_text' => $msg->thread_text
@@ -706,15 +680,12 @@ class Message extends \Goteo\Core\Model {
             if (isset($list[$msg->user])) {
                 $list[$msg->user]->messages[] = $msgData;
             } else {
-                //Eliminación User::getMini
-
                 $user = new User;
                 $user->id = $msg->user_id;
                 $user->name = $msg->user_name;
                 $user->email = $msg->user_email;
                 $user->avatar = Image::get($msg->user_avatar);
-
-                $user->messages = array();
+                $user->messages = [];
                 $user->messages[] = $msgData;
                 $list[$msg->user] = $user;
             }
@@ -746,11 +717,10 @@ class Message extends \Goteo\Core\Model {
                 ";
 
         $query = self::query($sql, array($user));
-        foreach ($query->fetchAll(\PDO::FETCH_CLASS) as $proj) {
+        foreach ($query->fetchAll(PDO::FETCH_CLASS) as $proj) {
             $projects[] = \Goteo\Model\Project::getMedium($proj->id);
         }
         return $projects;
     }
 
 }
-

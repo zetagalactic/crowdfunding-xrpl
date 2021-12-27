@@ -199,7 +199,7 @@ class MessageListener extends AbstractListener {
                 )
                 ->doAdmin('user');
 
-            // sent mail to project owner
+            // send mail to project owner
             $this->sendMailToRecipients($message, Template::OWNER_NEW_THREAD, [$project->getOwner()]);
         } elseif ($type === Message::TYPE_PROJECT_COMMENT_RESPONSE) {
             $log = new Feed();
@@ -227,7 +227,7 @@ class MessageListener extends AbstractListener {
             )
                 ->doPublic('community');
 
-            // sent mail to project owner and recipients
+            // send mail to project owner and recipients
             $this->sendMailToRecipients($message, Template::SUPPORT_THREAD_RESPONSE, $message->getRecipients());
         } elseif ($type === Message::TYPE_PROJECT_PRIVATE_COMMUNICATION) {
             $log = new Feed();
@@ -243,7 +243,7 @@ class MessageListener extends AbstractListener {
                 )
                 ->doAdmin('user');
 
-            // sent mail to recipients
+            // send mail to recipients
             $this->sendMailToRecipients($message, Template::MESSAGE_PROJECT_THREAD, $message->getRecipients(), $event->getDelayed());
         } elseif ($type === Message::TYPE_PROJECT_PRIVATE_COMMUNICATION_RESPONSE) {
             $log = new Feed();
@@ -259,7 +259,7 @@ class MessageListener extends AbstractListener {
                 )
                 ->doAdmin('user');
 
-            // sent mail to recipients
+            // send mail to recipients
             $recipients = $message->getRecipients();
             // To everyone on the same thread if shared
             if($message->shared) $recipients = $message->getParticipants();
