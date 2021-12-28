@@ -54,18 +54,14 @@ EOT
 		);
 	}
 
-	/**
-	 * Massive handling
-	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
-		$update  = $input->getOption('update');
-		$massive = $input->getArgument('mailer_id');
-		$force   = $input->getOption('force');
+        $massiveMailingId = $input->getArgument('mailer_id');
+        $update = $input->getOption('update');
+        $force = $input->getOption('force');
 
-		// cogemos el siguiente envío a tratar
-		$mailing = Sender::get($massive);
+		$mailing = Sender::get($massiveMailingId);
 		if (!$mailing instanceOf Sender) {
-			throw new ModelNotFoundException("ID [$massive] not found in mailer_content table!");
+			throw new ModelNotFoundException("ID [$massiveMailingId] not found in mailer_content table!");
 		}
 
 		// Limite para sender, (deja margen para envios individuales)
@@ -81,7 +77,7 @@ EOT
 		}
 
 		if (!$mailing->active) {
-            if($massive) {
+            if($massiveMailingId) {
                 $this->debug("No mailing to send", ['quota' => $LIMIT]);
                 return;
             }
@@ -106,7 +102,6 @@ EOT
 			return;
         }
 
-
         if (!$force) {
             $this->info("Locking massive mailing", [$mailing, 'quota' => $LIMIT]);
             if (!$mailing->setLock(true)->blocked) {
@@ -120,12 +115,17 @@ EOT
 		if ($total_pending == 0 && $update) {
 			$mailing = $this->dispatch(ConsoleEvents::MAILING_FINISHED, new FilterMailingEvent($mailing))->getSender();
 		} else {
-			$this->notice("Sending massive mailing", [$mailing, 'total_pending' => $total_pending, 'total_users' => $total_users, 'quota' => $LIMIT]);
+			$this->notice("Sending massive mailing", [
+                $mailing,
+                'total_pending' => $total_pending,
+                'total_users' => $total_users,
+                'quota' => $LIMIT
+            ]);
 
 			try {
 				$itime               = microtime(true);
 				$current_rate        = 0;
-				$current_concurrency = $increment = 2;
+				$current_concurrency = 2;
 				$iterations          = 0;
 				$php                 = (new PhpExecutableFinder())->find();
 
@@ -193,7 +193,6 @@ EOT
 						break;
 					}
 				}
-
 			} catch (Exception $e) {
 				$this->dispatch(ConsoleEvents::MAILING_ABORTED, new FilterMailingEvent($mailing, $e->getMessage()))->getSender();
 				throw $e;

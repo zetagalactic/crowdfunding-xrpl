@@ -23,8 +23,8 @@ class ConsoleMailingListener extends AbstractListener {
 
 	public function onSendMail(FilterSendmailEvent $event) {
 		$recipient = $event->getRecipient();
-
 		$errors = [];
+
 		if ($recipient->send($errors, ['blocked'])) {
 			$this->notice("Mail recipient sent successfully", [$recipient, 'recipient_user' => $recipient->user]);
 		} else {

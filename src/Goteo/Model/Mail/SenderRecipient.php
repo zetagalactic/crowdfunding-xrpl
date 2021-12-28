@@ -15,10 +15,12 @@ use Goteo\Application\Exception\ModelNotFoundException;
 use Goteo\Application\Exception\ModelException;
 use Goteo\Model\Mail;
 use Goteo\Model\User;
+use PDO;
+use PDOException;
+use function trim;
 
 /*
  * SenderRecipient for Sender class
- *
  */
 class SenderRecipient extends \Goteo\Core\Model
 {
@@ -79,19 +81,17 @@ class SenderRecipient extends \Goteo\Core\Model
             $this->dbInsertUpdate(['mailing', 'user', 'email', 'name', 'sent', 'error']);
             return true;
         }
-        catch(\PDOException $e) {
+        catch(PDOException $e) {
             $errors[] = 'Error saving email to database: ' . $e->getMessage();
         }
 
         return false;
-
     }
 
     /**
      * Send the email if ready
-     * @return [type] [description]
      */
-    public function send(&$errors = array(), array $skip_validations = [])
+    public function send(&$errors = [], array $skip_validations = [])
     {
         $ok = true;
         if(! $this->validate($errors, $skip_validations) ) {
@@ -123,13 +123,12 @@ class SenderRecipient extends \Goteo\Core\Model
             }
         }
 
-        $mail->to = \trim($this->email);
+        $mail->to = trim($this->email);
         $mail->toName = $this->name;
         $mail->subject = $sender->subject;
         $subscribe = SITE_URL . '/user/subscribe/' . $mail->getToken();
         $unsubscribe = SITE_URL . '/user/unsubscribe/' . $mail->getToken();
 
-        //
         $user= new User();
         $user->id=$this->user;
         $mail->content = str_replace(
@@ -145,8 +144,8 @@ class SenderRecipient extends \Goteo\Core\Model
         $this->sent = $ok;
         $this->error = implode("", $errors);
         $this->save();
-        return $ok;
 
+        return $ok;
     }
 
     public function isLocked() {
@@ -200,9 +199,7 @@ class SenderRecipient extends \Goteo\Core\Model
      */
     static public function getList($mailing, $detail = 'receivers', $offset = 0, $limit = 10, $count = false)
     {
-
         $list = array();
-
         $sqlFilter = " WHERE mailer_send.mailing = {$mailing}";
 
         switch ($detail) {
@@ -234,16 +231,13 @@ class SenderRecipient extends \Goteo\Core\Model
             ORDER BY sent ASC
             LIMIT $offset,$limit";
 
-        // die(\sqldbg($sql));
         if ($query = static::query($sql)) {
-            foreach ($query->fetchAll(\PDO::FETCH_CLASS, __CLASS__) as $user) {
+            foreach ($query->fetchAll(PDO::FETCH_CLASS, __CLASS__) as $user) {
                 $list[] = $user;
             }
         }
 
         return $list;
-
     }
 
 }
-
