@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * Model for Node Sections
@@ -10,12 +10,12 @@
  use Goteo\Application\Lang;
  use Goteo\Application\Config;
  use Goteo\Library\Text;
- 
+
  class NodeSections extends \Goteo\Core\Model {
 
   protected $Table = 'node_sections';
   protected static $Table_static = 'node_sections';
-  
+
   const SECTION_MAP             = 'map';
   const SECTION_RESOURCES       = 'resources';
   const SECTION_CALL_TO_ACTION  = 'call_to_action';
@@ -26,20 +26,22 @@
   const SECTION_WORKSHOPS       = 'workshops';
   const SECTION_TEAM            = 'team';
   const SECTION_SPONSORS        = 'sponsors';
+  const SECTION_DATA_SETS       = 'data_sets';
 
 
 
   static $SECTIONS = [
-    self::SECTION_MAP,
-    self::SECTION_RESOURCES,
-    self::SECTION_CALL_TO_ACTION,
-    self::SECTION_PROJECTS,
-    self::SECTION_POSTS,
-    self::SECTION_PROGRAM,
-    self::SECTION_STORIES,
-    self::SECTION_WORKSHOPS,
-    self::SECTION_TEAM,
-    self::SECTION_SPONSORS
+      self::SECTION_MAP,
+      self::SECTION_RESOURCES,
+      self::SECTION_CALL_TO_ACTION,
+      self::SECTION_PROJECTS,
+      self::SECTION_POSTS,
+      self::SECTION_PROGRAM,
+      self::SECTION_STORIES,
+      self::SECTION_WORKSHOPS,
+      self::SECTION_TEAM,
+      self::SECTION_SPONSORS,
+      self::SECTION_DATA_SETS
   ];
 
   public
@@ -64,25 +66,24 @@
    * @return  NodeSections object
    */
   public static function get($id) {
+      $lang = Lang::current();
+      list($fields, $joins) = self::getLangsSQLJoins($lang, Config::get('sql_lang'));
+      $sql = "
+          SELECT
+              node_sections.id as id,
+              node_sections.node as node,
+              node_sections.section as section,
+              $fields,
+              node_sections.main_image as main_image,
+              node_sections.order
+          FROM node_sections
+          $joins
+          WHERE node_sections.id = ?";
 
-    if(!$lang) $lang = Lang::current();
-    list($fields, $joins) = self::getLangsSQLJoins($lang, Config::get('sql_lang'));
+      $query = static::query($sql, $id);
+      $sections = $query->fetchObject(__CLASS__);
 
-    $sql = "SELECT 
-                  node_sections.id as id,
-                  node_sections.node as node,
-                  node_sections.section as section,
-                  $fields,
-                  node_sections.main_image as main_image,
-                  node_sections.order
-            FROM node_sections
-            $joins
-            WHERE node_sections.id = ?";
-
-    $query = static::query($sql, $id);
-    $sections = $query->fetchObject(__CLASS__);
-
-    return $sections;
+      return $sections;
   }
 
   public function getImage() {
@@ -196,10 +197,10 @@
      * @return  type bool   true|false
      */
     public function validate(&$errors = array()) {
-      if (empty($this->node)) 
+      if (empty($this->node))
         $errors[] = "The node sections member has no node";
 
-      if (empty($this->section)) 
+      if (empty($this->section))
         $errors[] = "The node sections member has no section";
 
       return empty($errors);
