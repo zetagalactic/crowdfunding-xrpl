@@ -6,14 +6,10 @@ $this->layout('channel/call/layout', [
 	'bodyClass' => 'channel-call',
     'title' => $this->channel->name,
     'meta_description' => $this->channel->subtitle,
-    'tw_image' => $meta_img
     ]);
 
 $this->section('channel-content');
 
-?>
-
-<?php
 ?>
 
 <?= $this->insert('channel/call/partials/banner_header') ?>
@@ -24,6 +20,13 @@ $this->section('channel-content');
 
 <?= $this->insert('channel/call/partials/projects') ?>
 
+<?= $this->insert('partials/components/values', [
+    'title' => $this->values->main_title,
+    'footprints' => $this->footprints,
+    'sdg_by_footprint' => $this->sdg_by_footprint,
+    'projects_by_footprint' => $this->projects_by_footprint
+]) ?>
+
 <?= $this->insert('channel/call/partials/posts_section') ?>
 
 <?= $this->insert('channel/call/partials/program') ?>
@@ -33,6 +36,10 @@ $this->section('channel-content');
 <?= $this->insert('channel/call/partials/related_workshops') ?>
 
 <?= $this->insert('channel/call/partials/resources') ?>
+
+<?php if ($dataSetsSection = $this->nodeSections['data_sets']): ?>
+    <?= $this->insert("channel/call/partials/data_sets", ['dataSetsSection' => $dataSetsSection]); ?>
+<?php endif; ?>
 
 <?= $this->insert('channel/call/partials/map') ?>
 
