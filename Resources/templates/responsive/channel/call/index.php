@@ -37,9 +37,7 @@ $this->section('channel-content');
 
 <?= $this->insert('channel/call/partials/resources') ?>
 
-<?php if ($dataSetsSection = $this->nodeSections['data_sets']): ?>
-    <?= $this->insert("channel/call/partials/data_sets", ['dataSetsSection' => $dataSetsSection]); ?>
-<?php endif; ?>
+<?= $this->insert("channel/call/partials/data_sets"); ?>
 
 <?= $this->insert('channel/call/partials/map') ?>
 

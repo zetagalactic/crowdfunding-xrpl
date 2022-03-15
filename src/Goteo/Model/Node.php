@@ -1234,14 +1234,15 @@ class Node extends \Goteo\Core\Model {
         return [];
     }
 
-    public function getSections($section = null) {
+    public function getSections(string $section = null) {
         $filter = [
             'node' => $this->id
         ];
 
         if ($section) $filter['section'] = $section;
 
-        return NodeSections::getList($filter, 0, 10);
+        $total = NodeSections::getList($filter, 0, 0, true);
+        return NodeSections::getList($filter, 0, $total);
     }
 
     public function findProject($pid)

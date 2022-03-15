@@ -54,10 +54,9 @@ trait DataSetRelationsTrait {
     /**
      * @return DataSet[]
      */
-    public function getAllDataSet($lang = null): array {
+    public function getAllDataSet(string $lang = null): array {
         $tb = strtolower($this->getTable());
         $rel = $this->getDataSetTable();
-        list($fields, $joins) = DataSet::getLangsSQLJoins($lang, Config::get('sql_lang'));
 
         $sql = "SELECT
                 data_set.id,
@@ -65,12 +64,12 @@ trait DataSetRelationsTrait {
                 data_set.description,
                 data_set.lang,
                 data_set.url,
+                data_set.type,
                 data_set.image,
-                data_set.created,
-                data_set.modified
+                data_set.created_at,
+                data_set.modified_at
             FROM `$rel`
             INNER JOIN data_set ON data_set.id = `$rel`.data_set_id
-            $joins
             WHERE `$rel`.{$tb}_id = :id
             ORDER BY `$rel`.order ASC";
         $values = [':id' => $this->id];

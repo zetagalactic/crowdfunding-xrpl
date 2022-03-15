@@ -111,13 +111,11 @@ class ChannelController extends Controller {
             'channel'     => $channel,
             'side_order' => $side_order,
             'summary' => $summary,
-            'sumcalls' => $sumcalls,
             'sponsors' => $sponsors,
             'categories' => $categories,
             'types' => $types,
             'colors' => $colors,
             'url_project_create' => '/channel/' . $id . '/create',
-            'nodeSections' => $sections
         ], 'channel/');
     }
 
@@ -131,6 +129,9 @@ class ChannelController extends Controller {
 
         $channel = Node::get($id);
         $config = $channel->getConfig();
+
+        $sectionsCount = NodeSections::getList(['node' => $channel->id], 0, 0, true);
+        $nodeSections = array_column(NodeSections::getList(['node' => $channel->id], 0, $sectionsCount), null, 'section');
 
         if ($config['projects']) {
             $list = Project::getList($config['projects'], $id, 0, $limit);
@@ -147,20 +148,20 @@ class ChannelController extends Controller {
 
         $view= $channel->type=='normal' ? 'channel/list_projects' : 'channel/'.$channel->type.'/index';
 
-        $dataSetsRepository = new DataSetRepository();
-        $dataSets = $dataSetsRepository->getListByChannel([$id]);
+        if ($nodeSections[NodeSections::SECTION_DATA_SETS]) {
+            $dataSetsRepository = new DataSetRepository();
+            $dataSets = $dataSetsRepository->getListByChannel([$id]);
+        }
 
         return $this->viewResponse(
             $view,
             [
                 'projects' => $list,
-                'category'=> $category,
                 'title_text' => Text::get('node-side-searcher-promote'),
-                'type' => $type,
                 'total' => $total,
                 'limit' => $limit,
-                'map' => $map,
-                'dataSets' => $dataSets
+                'dataSets' => $dataSets,
+                'nodeSections' => $nodeSections
             ]
         );
     }
