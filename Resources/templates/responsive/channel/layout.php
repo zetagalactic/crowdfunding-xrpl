@@ -77,9 +77,7 @@ $background = $this->channel->owner_background;
 
 <?php endif; ?>
 
-<?php if ($dataSetsSection = $this->nodeSections['data_sets']): ?>
-    <?= $this->insert("channel/partials/data_sets", ['dataSetsSection' => $dataSetsSection]); ?>
-<?php endif; ?>
+<?= $this->insert("channel/partials/data_sets"); ?>
 
 <?= $this->insert("channel/partials/posts_section") ?>
 

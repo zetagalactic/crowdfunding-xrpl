@@ -1,10 +1,11 @@
 <?php
-    $section = $this->dataSetsSection;
+if ($section = current($this->channel->getSections('data_sets'))):
+    $dataSets = $this->channel->getAllDataSet();
 ?>
 
-<div class="section data-sets-section">
+<div class="section data-sets">
     <div class="container">
-        <h2 class="title text-center"><?= $section->main_title ?></h2>
+        <h2 class="title"><?= $section->main_title ?></h2>
         <p class="description">
             <?= $section->main_description ?>
         </p>
@@ -12,3 +13,4 @@
     </div>
 </div>
 
+<?php endif; ?>
