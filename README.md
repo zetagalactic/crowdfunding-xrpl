@@ -1,126 +1,82 @@
+**Technical Side Of Our Project:**
 ---
-currentMenu: home
+Our project is an open-source crowdfunding platform powered by the XRP Ledger technology that processes all payments transactions XRPL blockchain for absolute transparency. Our project is going to be built into 2 Main Components:
+1.  "kick-off" Open Source Crowdfunding Platform (Goteo Version 3)
+2.  Smart-Contracts Integration With The XRPL
+
+   **Our Goals:**
+   1. Take advantage of the XRP Ledger to store the history of all transactions made by doners
+   2. Keep all donations anonymous to protect the identity of the donators.
+   3. Take advantage of the XRPL technology to empower our payment processing.
+   4. Any doner can fetch the history of his donations from the ledger as well as the project owner who received donations.
+   5. "Decentralized Crowdfunding Platform"
+
+   **Our Backend Technology:**
+   From a technical side, our project is a crowdfunding platform that collects donations and processes all payments transactions on the XRP Ledger. For this reason, our project is going to be built on top of 2 main components:
+
+   1. Goteo Version 3, the Open Source Crowdfunding Platform:
+   The Goteo platform already gave us a big push forward, as we've been concerned about coding the base platform but thanks to this open-source platform we can dedicate all of our time to building the ledger integration between our platform and the XRP Ledger.
+
+   2. The XRP Ledger Technology:
+   We're focusing our energy on building the perfect integration for our platform to make it run on the XRPL. We'd like to make the entire transaction history to be stored in the ledger for safekeeping. 
+
+   **The main XRPL Components we're relying on:**
+   Since we're going to run our platform on the blockchain we need the backup of such technology behind us. This is where the XRPL comes in. We rely on this powerful blockchain technology to empower our project. Our Project is based on an open-source project "Goteo Version 3" an Open Source Crowdfunding Platform. Our main play is to empower this platform with the XRPL as our secure transactions ledger for all donations made throughout the platform.
+   Below are the main components we're aiming to use:  
+   1. Accounts: https://xrpl.org/label-accounts.html:
+   This is crucial: We're going to open an account on the chosen currency where the funded projects are going to receive the donations, later they can choose to withdraw their balance.
+
+ 2. Cross-currency: https://xrpl.org/label-cross-currency.html
+ We're happy to say that our platform will support multi-currency donation so both the donator and the funded project owner can choose their favorite currency
+
+ 3. Transaction Sending: https://xrpl.org/label-transaction-sending.html
+ Our core function is transactions via the XRPL, this is where all donations are taking place.
+ 
+  **How Does Our Platform Works?**
+ 1. A user creates a project or a campaign to raise a certain amount of funds.
+ 2. Our team verifies the project detail against spam and other certain violations.
+ 3. We create a new account for this project in the XRPL where it's going to receive money.
+ 4. The website visitors will find the project/campaign listing and will be able to donate using their soft wallet right inside the project landing page.
+ 5. The project owner will get notified of all received donations and will be able to withdraw their raised fund when it reached the desired amount.
+
+That's all!
+
+**How Our Project Will Benefit The XRPL Community?**
 ---
-Goteo The Open Source Crowdfunding Platform
-===========================================
+1. One of our project's main component is **"Payment Processor Integration For The XRPL"** is going to become a handful of open source project that all XRPL community can use and integrates within their projects. 
+2. Thanks to our open-source license, we believe that we're preparing a precious piece of work for the community who will respond to it with generous contributions and help us improve and open new potential for it.
+3. Our project will provide an open-source XRPL Integration that the community members can use to empower their projects with the XRPL. E.g: if you have a simple platform that processes/stores any kind of payments transactions, our **XRPL Integration** will help you make all your financial activities tracked and timestamped on the XRPL blockchain so you'll have a secure leader solution that no one can mess with.
 
-[![[CI] Test](https://github.com/GoteoFoundation/goteo/actions/workflows/test.yml/badge.svg)](https://github.com/GoteoFoundation/goteo/actions/workflows/test.yml)
+**Our Plan Of Licensing Our Work**
+---
+One of our project's main components is an open-source project and we appreciate this as it gave us a huge jump-off to save the recourses of building it. We don't want our integration to be hard-coded for this platform only! So we're going to make sure that it's going to be open for customizations for any other platform, we're going to do the following concerning the licensing:
+1. A open-source version of our project will be available for the community
+2. An separate open-source version of the **XRPL Integration Component** will be available for the XRPL community to integrate on their platform
 
-This is the source code of the [Crowdfunding platform Goteo](http://goteo.org).
+**Key Deliverables & Milestones**
+---
 
-The Goteo platform is a recognized, award-winning creator of an open standard for crowdfunding for social impact and generating new digital commons, which has been founded and designed by [Platoniq](http://platoniq.net). Platoniq is also the founding board member of the Goteo Foundation which is the responsible for the maintenance of this code.
+**Milestones**
+ 1. First 2: months: Work on the development of the first beta.
+ 2. Month 3: Publish the initial beta version & open access for testing.
+ 3. Month 4: Continue working on the beta development.
+ 4. Month 5: Finalize the beta version and publish the production site.
+ 5. Month 6: Put together a marketing strategy and run different campaigns in selected countries
 
-[![Backed by Goteo Foundation](docs/developers/assets/foundation-logo.png)](https://foundation.goteo.org) &nbsp; [![Created by  Platoniq Sistema Cultural](docs/developers/assets/platoniq-logo.png)](http://platoniq.net)
-
-### Features
-
-This is a web app that allows the receipt, review and publishing of collective campaigns for their collective funding and the receiving of collaborations as well as the dynamic visualization of the support received, classification of initiatives and campaign tracking. The system also permits secure and distributed communication with users and between users, administration of highlighted projects on the home page and the creation of periodical publications such as blogs, a FAQ section and static pages.
-
-### INSTALL
-
-Current version: **3.5**
-
-Although you can try to install it in order to create your own crowdfunding platform, this won't be a *Wordpress*-like installation (probably never will). These releases are mostly for developers and for those who want to collaborate with the code.
-
-Full developers documentation is still work in progress!
-Some folders may have its own README.md file with comments. However, we will try to compile all the documents here:
-
-### DOCUMENTATION
-
-- [Install](http://goteofoundation.github.io/goteo/docs/install.html)
-- [Upgrade](http://goteofoundation.github.io/goteo/docs/upgrade.html)
-
-> ### Docker quickstart:
->
->  First ensure you have `docker-compose` properly installed, then create a config file and use the wrapper `docker/up`:
->
-> ```bash
-> cp config/docker-settings.yml config/local-docker-settings.yml
-> docker/up
-> ```
->
-> Then you can run commands inside the php container by using the wrapper `docker/exec`. 
-> 
-> If developing, we recommend running this command in a separate terminal:
-> ```bash
-> docker/exec grunt watch
-> ```
->
-> [More info](http://goteofoundation.github.io/goteo/docs/developers/docker.html)
-
-### CONTRIBUTING
-
-There's still a lot of missing documentation. We'll try to do our best completing it, however any help will be appreciated.
-
-- [Developers](http://goteofoundation.github.io/goteo/docs/developers/environment.html)
-- [Credits](http://goteofoundation.github.io/goteo/release_notes.html)
-
-### TRANSLATORS
-
-Since version 3.3 where are using [Crowdin](https://crowdin.com/) as a tool for collaborators translating the code. Feel free to join these awesome people who's contributed in translating Goteo to many languages:
-
-<translators>
-
-<ul>
-	<li>Dan Walenter (cas3v0n)</li>
-	<li>m19951996</li>
-	<li>X (owenthe4th)</li>
-	<li>mrfinearts</li>
-	<li>Cyberience</li>
-	<li>Denver Moon (9003104)</li>
-	<li>Wilmer Alzate (waar19)</li>
-	<li>Pierre Cardin (reportreport)</li>
-	<li>elpoliglota (josedpg11)</li>
-	<li>erinbash</li>
-	<li>ErikaInsalata</li>
-	<li>Chris_W</li>
-	<li>David (dabeig)</li>
-	<li>Ismaila (iandiaye)</li>
-	<li>Joy Lohmann (j.lohmann)</li>
-	<li>gracine</li>
-	<li>Alessandro Ravanetti (aleravanetti)</li>
-	<li>CataAz</li>
-	<li>jmontane</li>
-	<li>fundycharity</li>
-	<li>Ahmad Ainul Rizki (netfr13nd)</li>
-	<li>Ahmad Wafa Mansur (wafa.mansur21)</li>
-	<li>Tiago Santos (tisantos)</li>
-	<li>pep_laDeriva</li>
-	<li>detotty</li>
-	<li>Ruwan Egodawatte (ruwanego)</li>
-	<li>susinho_pantani</li>
-	<li>Iulian Mongescu (iulian.mongescu)</li>
-	<li>Udo Wierlemann (Udo.Wierlemann)</li>
-	<li>Xurxo Guerra (xguerrap)</li>
-	<li>melsmacan</li>
-	<li>enolp</li>
-	<li>Júlia Petúlia Sol (juliaxsol)</li>
-	<li>Harun Demirel (translator93)</li>
-	<li>firewall (Onrkskn)</li>
-	<li>shaunmatthew</li>
-	<li>Herii (HERII12)</li>
-	<li>franzancot</li>
-	<li>zainalkhalid</li>
-	<li>elena-2018</li>
-	<li>Clint Mark Cortes (cortesclintmark)</li>
-	<li>Alexander Stellmach (helpPAM)</li>
-	<li>joao.cruz</li>
-	<li>kguanzon (Kimberly Guanzon) (kim0421)</li>
-	<li>Ferran Reyes (ferranreyesgoteo)</li>
-	<li>Vanessa.Montes</li>
-	<li>ismaeljoseph</li>
-	<li>Carine_cha</li>
-	<li>arkimessi</li>
-</ul>
-</translators>
-
-You can join the Crowdin translator team here: https://translate.goteo.org/
+**Deliverables:**
+Our deliverables will consist of a beta test version and a production version of our platform. In less than 6 months we hope to end up with a working crowdfunding platform that runs on the XRPL blockchain. We aim to finish the development in the first 5 months to spear more time for the marketing phase of our project. We hope that if our current project succeeds, we're going to have a higher chance to get another grant in the next waves.
 
 
-*This documentation is created using [Couscous](http://couscous.io).*
+**Our Future Goals!!**
+---
+Our hope lies in making our platform works similarly to how the Blockchain does:
+1. Completely Decentralized
+2. Runs on Web3.0
+3. Maintained By The Community
+4. Run Its Own CryptoCurrency
 
-License
--------
 
-The code licensed here under the **GNU Affero General Public License**, version 3 AGPL-3.0 has been developed by the Goteo team led by Platoniq and subsequently transferred to the Fundación Goteo, as detailed in http://www.goteo.org/about#info6
-
+Demo Content:
+----
+**Demo page that represents how the site will look like:**
+https://en.goteo.org/project/tres-cadires-motor-agroecologic
